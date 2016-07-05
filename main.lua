@@ -1,27 +1,18 @@
 local producer = require("producer")
+local broker_mgr = require("broker_mgr")
+
 local m = {}
 
 function m.run()
-	local cjson = require "cjson"
-	local producer = require "resty.kafka.producer"
 
-	local broker_list = {
-		{ host = "127.0.0.1", port = 9092 },
-	}
+	local req = producer.create_request("url", "helloworld")
 
-	local ps = {}
-	local i
-	p = producer:new(broker_list)
+	local broker = broker_mgr.get_broker("127.0.0.1", 9092)
 
-	local message = "halo world"
+	local bytes = broker:send(req)
+	
+	ngx.say("send bytes", bytes)
 
-	local offset, err = producer:send("request", nil, message)
-	if not offset then
-		ngx.say("send err:", err)
-		return
-	end
-
-	ngx.say("offset: ", tostring(offset))
 end
 
 return m
